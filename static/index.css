@@ -1,0 +1,47 @@
+.agent-select {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        body {
+            padding-top: 4rem;
+            padding-bottom: 40px;
+            background-color: #f8f9fa;
+            
+
+            h1,h2,h3,h4{
+            font-family: "Roboto", sans-serif;
+            font-weight: 700;
+
+            }
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+        .card-header {
+            background-color: #212529;
+            color:black;
+            font-weight: bold;
+
+        }
+        .btn-primary {
+            background-color: #3d5afe;
+            border-color: #3d5afe;
+        }
+        .btn-primary:hover {
+            background-color: #0031ca;
+            border-color: #0031ca;
+        }
+
+        /* Add to existing style section */
+        .loading-state {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #loadingModal .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.25em;
+        }
