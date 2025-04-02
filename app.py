@@ -10,6 +10,9 @@ app = Flask(__name__)
 # List of diverse user agents focusing on scripts and tools
 USER_AGENTS = [
     # PowerShell
+    "Powershell",
+    "Python",
+    "Microsoft",
     "Mozilla/5.0 (Windows NT 10.0; Microsoft Windows 10.0.22621; en-US) PowerShell/7.3.1",
     "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.1778",
     
