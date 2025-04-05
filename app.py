@@ -164,10 +164,8 @@ def fetch():
                         successful_result=successful_result, 
                         url=urlparse(url).netloc
                     )
-            else:
-                print(results)
-                return render_template('no_results.html',results=results)    
-    
+                
+    return render_template('no_results.html',results=results)
     
 
 if __name__ == '__main__':
