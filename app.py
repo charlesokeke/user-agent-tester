@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from concurrent.futures import ThreadPoolExecutor
 import time
 import json
@@ -84,7 +86,7 @@ def make_request(url, user_agent):
     headers = {"User-Agent": user_agent}
     try:
         start_time = time.time()
-        response = requests.get(url, headers=headers, timeout=20, verify=False)
+        response = requests.get(url, headers=headers, timeout=30, verify=False)
         end_time = time.time()
         
         # Parse URL info including parameters
@@ -169,4 +171,4 @@ def fetch():
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
