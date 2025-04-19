@@ -3,216 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Results</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Request Results (Tailwind)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                'poppins': ['Poppins', 'sans-serif'],
+                'roboto': ['Roboto', 'sans-serif'],
+              },
+            }
+          }
+        }
+      </script>
+     <style type="text/tailwindcss">
+        body {
+            font-family: theme('fontFamily.roboto');
+            @apply bg-gray-100 text-gray-800;
+        }
+        /* Custom styles for Tailwind to mimic Bootstrap tab active state if needed, */
+        /* although Bootstrap JS might handle this adequately by adding its 'active' class. */
+        /* You might need to style the .active class directly if Bootstrap's default isn't sufficient */
+        .tab-button.active {
+             @apply text-blue-600 border-blue-600;
+        }
+        .tab-pane {
+            /* Basic styling for tab panes, Bootstrap JS adds 'active' */
+            @apply hidden pt-4; /* Start hidden, add padding */
+        }
+        .tab-pane.active {
+            @apply block; /* Bootstrap JS will add this class */
+        }
+        /* Replicate fade effect (optional) */
+        .tab-pane.fade {
+            @apply transition-opacity duration-150 ease-linear;
+        }
+        .tab-pane.fade:not(.show) {
+            @apply opacity-0;
+        }
+        .tab-pane.fade.show {
+            @apply opacity-100; /* Bootstrap JS adds 'show' */
+        }
+
+        /* Basic Table Styling */
+        .table-base {
+             @apply w-full text-sm text-left border-collapse;
+        }
+        .table-base th, .table-base td {
+             @apply border border-gray-300 px-3 py-2;
+        }
+        .table-base th {
+             @apply bg-gray-100 font-semibold;
+        }
+        /* Striped effect for specific tables */
+        .table-striped tbody tr:nth-child(even) {
+            @apply bg-gray-50;
+        }
     </style>
-    
 </head>
-<body>
-    <div class="container">
-        <h2 class="text-center mb-4">HTTP Request Results</h2>
-        
-        <div class="domain-info">
-            <h5 ><i class="fas fa-link me-2"></i> Target Domain: <span style="color:blue">{{ url }}</span></h5>
-            <a href="/" class="btn btn-primary"><i class="fas fa-plus me-2"></i> New Test</a>
+<body class="py-8">
+
+    <div class="container mx-auto px-4 max-w-6xl">
+        <h2 class="text-center text-2xl font-semibold mb-6 text-gray-700">HTTP Request Results</h2>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 px-4 py-3 bg-white rounded shadow-sm border border-gray-200">
+            <h5 class="text-base sm:text-lg font-medium text-gray-700 text-center sm:text-left">
+                <i class="fas fa-link mr-2 text-gray-500"></i>Target Domain: <span class="text-blue-600 break-all">{{ url }}</span>
+            </h5>
+            <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex-shrink-0">
+                <i class="fas fa-plus mr-2"></i> New Test
+            </a>
         </div>
-        
+
         {% if successful_result %}
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Successful Response</h5>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-green-600 text-white px-6 py-4">
+                <h5 class="text-lg font-semibold mb-0">Successful Response</h5>
             </div>
-            <div class="card-body">
-                <ul class="nav nav-tabs" id="resultTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">General Info</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-info" type="button" role="tab">URL Analysis</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="headers-tab" data-bs-toggle="tab" data-bs-target="#headers" type="button" role="tab">Headers</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="cookies-tab" data-bs-toggle="tab" data-bs-target="#cookies" type="button" role="tab">Cookies</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab">Content</button>
-                    </li>
-                    {% if successful_result.redirected %}
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="redirects-tab" data-bs-toggle="tab" data-bs-target="#redirects" type="button" role="tab">Redirects</button>
-                    </li>
-                    {% endif %}
-                </ul>
-                
-                <div class="tab-content" id="resultTabsContent">
-                    <!-- General Info Tab -->
+            <div class="p-6">
+                <div class="border-b border-gray-200 mb-6">
+                    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500" id="resultTabs" role="tablist">
+                         <li class="mr-2" role="presentation">
+                            <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General Info</button>
+                         </li>
+                         <li class="mr-2" role="presentation">
+                            <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-info" type="button" role="tab" aria-controls="url-info" aria-selected="false">URL Analysis</button>
+                         </li>
+                         <li class="mr-2" role="presentation">
+                            <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="headers-tab" data-bs-toggle="tab" data-bs-target="#headers" type="button" role="tab" aria-controls="headers" aria-selected="false">Headers</button>
+                         </li>
+                         <li class="mr-2" role="presentation">
+                            <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="cookies-tab" data-bs-toggle="tab" data-bs-target="#cookies" type="button" role="tab" aria-controls="cookies" aria-selected="false">Cookies</button>
+                         </li>
+                          <li class="mr-2" role="presentation">
+                            <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab" aria-controls="content" aria-selected="false">Content</button>
+                         </li>
+                        {% if successful_result.redirected %}
+                         <li class="mr-2" role="presentation">
+                            <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" id="redirects-tab" data-bs-toggle="tab" data-bs-target="#redirects" type="button" role="tab" aria-controls="redirects" aria-selected="false">Redirects</button>
+                         </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div id="resultTabsContent">
                     <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <tr>
-                                    <th>User-Agent</th>
-                                    <td>{{ successful_result.user_agent }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Status Code</th>
-                                    <td>{{ successful_result.status_code }} ({{ successful_result.reason }})</td>
-                                </tr>
-                                <tr>
-                                    <th>Content Type</th>
-                                    <td>{{ successful_result.content_type }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Content Length</th>
-                                    <td>{{ successful_result.content_length }} bytes</td>
-                                </tr>
-                                <tr>
-                                    <th>Encoding</th>
-                                    <td>{{ successful_result.encoding }} (Apparent: {{ successful_result.apparent_encoding }})</td>
-                                </tr>
-                                <tr>
-                                    <th>Response Time</th>
-                                    <td>{{ successful_result.time_taken }} seconds (Server reported: {{ successful_result.elapsed }})</td>
-                                </tr>
-                                <tr>
-                                    <th>Original URL</th>
-                                    <td>{{ successful_result.original_url }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Final URL</th>
-                                    <td>{{ successful_result.url }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Redirected</th>
-                                    <td>
-                                        {% if successful_result.redirected %}
-                                        Yes ({{ successful_result.redirect_count }} redirects)
-                                        {% else %}
-                                        No
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Is Redirect</th>
-                                    <td>{{ successful_result.is_redirect }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Is Permanent Redirect</th>
-                                    <td>{{ successful_result.is_permanent_redirect }}</td>
-                                </tr>
+                        <div class="overflow-x-auto">
+                            <table class="table-base min-w-full">
+                                <tbody>
+                                    <tr> <th class="w-1/3">User-Agent</th> <td class="break-all">{{ successful_result.user_agent }}</td> </tr>
+                                    <tr> <th>Status Code</th> <td>{{ successful_result.status_code }} ({{ successful_result.reason }})</td> </tr>
+                                    <tr> <th>Content Type</th> <td class="break-all">{{ successful_result.content_type }}</td> </tr>
+                                    <tr> <th>Content Length</th> <td>{{ successful_result.content_length }} bytes</td> </tr>
+                                    <tr> <th>Encoding</th> <td>{{ successful_result.encoding }} (Apparent: {{ successful_result.apparent_encoding }})</td> </tr>
+                                    <tr> <th>Response Time</th> <td>{{ successful_result.time_taken }} seconds (Server reported: {{ successful_result.elapsed }})</td> </tr>
+                                    <tr> <th>Original URL</th> <td class="break-all">{{ successful_result.original_url }}</td> </tr>
+                                    <tr> <th>Final URL</th> <td class="break-all">{{ successful_result.url }}</td> </tr>
+                                    <tr> <th>Redirected</th>
+                                         <td> {% if successful_result.redirected %} Yes ({{ successful_result.redirect_count }} redirects) {% else %} No {% endif %} </td>
+                                    </tr>
+                                    <tr> <th>Is Redirect</th> <td>{{ successful_result.is_redirect }}</td> </tr>
+                                    <tr> <th>Is Permanent Redirect</th> <td>{{ successful_result.is_permanent_redirect }}</td> </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
-                    
-                    <!-- URL Analysis Tab -->
+
                     <div class="tab-pane fade" id="url-info" role="tabpanel" aria-labelledby="url-tab">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5>Original URL Analysis</h5>
-                                <div class="table-responsive params-block">
-                                    <table class="table table-bordered param-table">
-                                        <tr>
-                                            <th>Scheme</th>
-                                            <td>{{ successful_result.original_url_info.scheme }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Domain (netloc)</th>
-                                            <td>{{ successful_result.original_url_info.netloc }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Path</th>
-                                            <td>{{ successful_result.original_url_info.path }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Parameters</th>
-                                            <td>{{ successful_result.original_url_info.params }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Query String</th>
-                                            <td>{{ successful_result.original_url_info.query }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Fragment</th>
-                                            <td>{{ successful_result.original_url_info.fragment }}</td>
-                                        </tr>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="text-md font-semibold mb-3 text-gray-700">Original URL Analysis</h5>
+                                <div class="overflow-x-auto mb-4">
+                                    <table class="table-base min-w-full">
+                                         <tbody>
+                                            <tr><th class="w-1/3">Scheme</th><td>{{ successful_result.original_url_info.scheme }}</td></tr>
+                                            <tr><th>Domain (netloc)</th><td>{{ successful_result.original_url_info.netloc }}</td></tr>
+                                            <tr><th>Path</th><td class="break-all">{{ successful_result.original_url_info.path }}</td></tr>
+                                            <tr><th>Parameters</th><td>{{ successful_result.original_url_info.params }}</td></tr>
+                                            <tr><th>Query String</th><td class="break-all">{{ successful_result.original_url_info.query }}</td></tr>
+                                            <tr><th>Fragment</th><td>{{ successful_result.original_url_info.fragment }}</td></tr>
+                                        </tbody>
                                     </table>
                                 </div>
-                                
                                 {% if successful_result.original_url_info.query_params %}
-                                <h6 class="mt-3">Query Parameters</h6>
-                                <div class="params-block">
-                                    <table class="table table-sm">
+                                <h6 class="text-sm font-semibold mb-2 text-gray-600">Query Parameters</h6>
+                                <div class="overflow-x-auto">
+                                    <table class="table-base table-striped min-w-full">
                                         <thead>
-                                            <tr>
-                                                <th>Parameter</th>
-                                                <th>Value</th>
-                                            </tr>
+                                            <tr><th>Parameter</th><th>Value</th></tr>
                                         </thead>
                                         <tbody>
                                             {% for key, value in successful_result.original_url_info.query_params.items() %}
-                                            <tr>
-                                                <td>{{ key }}</td>
-                                                <td>{{ value }}</td>
-                                            </tr>
+                                            <tr><td class="font-medium break-all">{{ key }}</td><td class="break-all">{{ value }}</td></tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
                                 {% endif %}
                             </div>
-                            
-                            <div class="col-md-6">
-                                <h5>Final URL Analysis</h5>
-                                <div class="table-responsive params-block">
-                                    <table class="table table-bordered param-table">
-                                        <tr>
-                                            <th>Scheme</th>
-                                            <td>{{ successful_result.final_url_info.scheme }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Domain (netloc)</th>
-                                            <td>{{ successful_result.final_url_info.netloc }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Path</th>
-                                            <td>{{ successful_result.final_url_info.path }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Parameters</th>
-                                            <td>{{ successful_result.final_url_info.params }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Query String</th>
-                                            <td>{{ successful_result.final_url_info.query }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Fragment</th>
-                                            <td>{{ successful_result.final_url_info.fragment }}</td>
-                                        </tr>
+                            <div>
+                                <h5 class="text-md font-semibold mb-3 text-gray-700">Final URL Analysis</h5>
+                                 <div class="overflow-x-auto mb-4">
+                                    <table class="table-base min-w-full">
+                                         <tbody>
+                                            <tr><th class="w-1/3">Scheme</th><td>{{ successful_result.final_url_info.scheme }}</td></tr>
+                                            <tr><th>Domain (netloc)</th><td>{{ successful_result.final_url_info.netloc }}</td></tr>
+                                            <tr><th>Path</th><td class="break-all">{{ successful_result.final_url_info.path }}</td></tr>
+                                            <tr><th>Parameters</th><td>{{ successful_result.final_url_info.params }}</td></tr>
+                                            <tr><th>Query String</th><td class="break-all">{{ successful_result.final_url_info.query }}</td></tr>
+                                            <tr><th>Fragment</th><td>{{ successful_result.final_url_info.fragment }}</td></tr>
+                                        </tbody>
                                     </table>
                                 </div>
-                                
                                 {% if successful_result.final_url_info.query_params %}
-                                <h6 class="mt-3">Query Parameters</h6>
-                                <div class="params-block">
-                                    <table class="table table-sm">
+                                <h6 class="text-sm font-semibold mb-2 text-gray-600">Query Parameters</h6>
+                                <div class="overflow-x-auto">
+                                    <table class="table-base table-striped min-w-full">
                                         <thead>
-                                            <tr>
-                                                <th>Parameter</th>
-                                                <th>Value</th>
-                                            </tr>
+                                            <tr><th>Parameter</th><th>Value</th></tr>
                                         </thead>
                                         <tbody>
                                             {% for key, value in successful_result.final_url_info.query_params.items() %}
-                                            <tr>
-                                                <td>{{ key }}</td>
-                                                <td>{{ value }}</td>
-                                            </tr>
+                                            <tr><td class="font-medium break-all">{{ key }}</td><td class="break-all">{{ value }}</td></tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
@@ -221,108 +198,73 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Headers Tab -->
+
                     <div class="tab-pane fade" id="headers" role="tabpanel" aria-labelledby="headers-tab">
-                        <h5>Response Headers</h5>
-                        <div class="headers-block">
-                            <table class="table table-sm table-striped">
+                        <h5 class="text-md font-semibold mb-3 text-gray-700">Response Headers</h5>
+                        <div class="overflow-x-auto">
+                            <table class="table-base table-striped min-w-full">
                                 <thead>
-                                    <tr>
-                                        <th>Header</th>
-                                        <th>Value</th>
-                                    </tr>
+                                    <tr><th class="w-1/3">Header</th><th>Value</th></tr>
                                 </thead>
                                 <tbody>
                                     {% for header, value in successful_result.headers.items() %}
-                                    <tr>
-                                        <td class="fw-bold">{{ header }}</td>
-                                        <td>{{ value }}</td>
-                                    </tr>
+                                    <tr><td class="font-medium break-all">{{ header }}</td><td class="break-all">{{ value }}</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
-                    <!-- Cookies Tab -->
+
                     <div class="tab-pane fade" id="cookies" role="tabpanel" aria-labelledby="cookies-tab">
-                        <h5>Response Cookies</h5>
+                        <h5 class="text-md font-semibold mb-3 text-gray-700">Response Cookies</h5>
                         {% if successful_result.cookies %}
-                        <div class="headers-block">
-                            <table class="table table-sm table-striped">
+                        <div class="overflow-x-auto">
+                            <table class="table-base table-striped min-w-full">
                                 <thead>
-                                    <tr>
-                                        <th>Cookie</th>
-                                        <th>Value</th>
-                                    </tr>
+                                    <tr><th class="w-1/3">Cookie</th><th>Value</th></tr>
                                 </thead>
                                 <tbody>
                                     {% for cookie, value in successful_result.cookies.items() %}
-                                    <tr>
-                                        <td class="fw-bold">{{ cookie }}</td>
-                                        <td>{{ value }}</td>
-                                    </tr>
+                                    <tr><td class="font-medium break-all">{{ cookie }}</td><td class="break-all">{{ value }}</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                         {% else %}
-                        <div class="alert alert-info">No cookies were returned by the server.</div>
+                        <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded relative text-sm" role="alert">
+                            No cookies were returned by the server.
+                        </div>
                         {% endif %}
                     </div>
-                    
-                    <!-- Content Tab -->
+
                     <div class="tab-pane fade" id="content" role="tabpanel" aria-labelledby="content-tab">
-                        <h5>Response Content</h5>
-                        <div class="content-block">
-                            {{ successful_result.content|e }}
-                        </div>
+                         <h5 class="text-md font-semibold mb-3 text-gray-700">Response Content</h5>
+                         <div class="bg-gray-800 text-gray-200 p-4 rounded border border-gray-600 font-mono text-xs overflow-x-auto whitespace-pre-wrap max-h-96">
+                            {{- successful_result.content|e -}} {# Use Jinja whitespace control and escape #}
+                         </div>
                     </div>
-                    
-                    <!-- Redirects Tab -->
+
                     {% if successful_result.redirected %}
                     <div class="tab-pane fade" id="redirects" role="tabpanel" aria-labelledby="redirects-tab">
-                        <h5>Redirect Chain</h5>
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
+                        <h5 class="text-md font-semibold mb-3 text-gray-700">Redirect Chain</h5>
+                        <div class="overflow-x-auto">
+                            <table class="table-base min-w-full">
                                 <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>URL</th>
-                                        <th>Status Code</th>
-                                    </tr>
+                                    <tr><th class="w-1/6">#</th><th class="w-2/3">URL</th><th>Status Code</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Original</td>
-                                        <td>{{ successful_result.original_url }}</td>
-                                        <td>-</td>
-                                    </tr>
+                                    <tr><td class="font-medium">Original</td><td class="break-all">{{ successful_result.original_url }}</td><td>-</td></tr>
                                     {% for redirect in successful_result.history %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td>{{ redirect.url }}</td>
-                                        <td>{{ redirect.status_code }}</td>
-                                    </tr>
+                                    <tr><td>{{ loop.index }}</td><td class="break-all">{{ redirect.url }}</td><td>{{ redirect.status_code }}</td></tr>
                                     {% endfor %}
-                                    <tr>
-                                        <td>Final</td>
-                                        <td>{{ successful_result.url }}</td>
-                                        <td>{{ successful_result.status_code }}</td>
-                                    </tr>
+                                    <tr><td class="font-medium">Final</td><td class="break-all">{{ successful_result.url }}</td><td>{{ successful_result.status_code }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
+                </div> </div> </div> {% endif %}
 
-    <!-- Added Bootstrap JS for proper component functionality -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

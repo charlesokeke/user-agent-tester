@@ -3,52 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User-Agent Tester</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>User-Agent Tester (Tailwind)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-        </style>
-    <style>
-        
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Optional Tailwind configuration
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                'poppins': ['Poppins', 'sans-serif'],
+                'roboto': ['Roboto', 'sans-serif'],
+              },
+            }
+          }
+        }
+      </script>
+     <style type="text/tailwindcss">
+        /* Add base font family if not relying solely on utilities */
+        body {
+            font-family: theme('fontFamily.roboto');
+            @apply bg-gray-100 text-gray-800;
+        }
+        /* Style for the spinner to replicate Bootstrap's size */
+        .spinner-sm {
+            @apply inline-block w-4 h-4 border-2 border-current border-r-transparent rounded-full animate-spin;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2 class="text-center mb-4"><i class="fas fa-terminal me-2"></i>User-Agent HTTP Request Tester</h2>
-        
-        <div class="card">
-            <div class="card-header bg-light text-bold">
-                <h5 class="mb-0" style="font-family: 'Poppins', sans-serif;padding-top: 30px;"><i class="fas fa-flask me-2"></i>Test a website with spoofed user-agents</h5>
+<body class="py-8"> 
+
+    <div class="container mx-auto px-4 max-w-4xl"> 
+        <h2 class="text-center text-2xl font-semibold mb-6">
+            <i class="fas fa-terminal inline-block mr-2"></i>User-Agent HTTP Request Tester
+        </h2>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            <div class="bg-gray-50 border-b border-gray-200 px-6 pt-6 pb-4"> 
+                <h5 class="text-lg font-semibold font-poppins mb-0">
+                    <i class="fas fa-flask inline-block mr-2"></i>Test a website with spoofed user-agents
+                </h5>
             </div>
-            <div class="card-body">
-                <form action="/fetch" method="post">
-                    <div class="mb-3">
-                        <label for="url" class="form-label"><i class="fas fa-link me-2"></i>Target URL</label>
-                        <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com" required>
-                        <div class="form-text"><i class="fas fa-info-circle me-2"></i>Enter the full URL including http:// or https://</div>
+            <div class="p-6">
+                <form action="/fetch" method="post" id="uaForm">
+                    <div class="mb-5">
+                        <label for="url" class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-link inline-block mr-2 w-4 text-center"></i>Target URL
+                        </label>
+                        <input type="url" class="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="url" name="url" placeholder="https://example.com" required>
+                        <p class="mt-1 text-xs text-gray-500">
+                            <i class="fas fa-info-circle inline-block mr-2 w-4 text-center"></i>Enter the full URL including http:// or https://
+                        </p>
                     </div>
-                    
-                    <div class="mb-2">
-                        <label class="form-label"><i class="fas fa-list-check me-2"></i>Select User-Agents (leave empty to use all)</label>
-                        <div class="agent-select border rounded p-3">
+
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-list-check inline-block mr-2 w-4 text-center"></i>Select User-Agents (leave empty to use all)
+                        </label>
+                        <div class="border border-gray-300 rounded-md p-3 max-h-60 overflow-y-auto space-y-2"> 
                             {% for agent in user_agents %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="agents" value="{{ agent }}" id="agent{{ loop.index }}">
-                                <label class="form-check-label text-break" for="agent{{ loop.index }}">
-                                    <i class="fas fa-caret-right me-2"></i>{{ agent }}
+                            <div class="flex items-center">
+                                <input class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" type="checkbox" name="agents" value="{{ agent }}" id="agent{{ loop.index }}">
+                                <label class="ml-2 block text-sm text-gray-800 break-words cursor-pointer" for="agent{{ loop.index }}">
+                                    <i class="fas fa-caret-right inline-block mr-1 text-gray-400"></i>{{ agent }}
                                 </label>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
-                    
-                    <div class="">
-                        <button type="submit" class="btn btn-success" id="submitBtn">
-                            <span class="normal-state"><i class="fas fa-paper-plane me-2"></i>Send Requests</span>
-                            <span class="loading-state d-none">
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+
+                    <div class="mt-6">
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed" id="submitBtn">
+                            <span class="normal-state">
+                                <i class="fas fa-paper-plane inline-block mr-2"></i>Send Requests
+                            </span>
+                            <span class="loading-state hidden"> 
+                                <span class="spinner-sm mr-2" role="status" aria-hidden="true"></span>
                                 Sending Requests...
                             </span>
                         </button>
@@ -57,25 +90,50 @@
                 </form>
             </div>
         </div>
-    
-        <div class="card">
-            <div class="card-header bg-light text-bold">
-                <h5 class="mb-0" style="font-family: 'Poppins', sans-serif;padding-top: 30px;"><i class="fas fa-circle-info me-2"></i>About this tool</h5>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-gray-50 border-b border-gray-200 px-6 pt-6 pb-4">
+                <h5 class="text-lg font-semibold font-poppins mb-0">
+                    <i class="fas fa-circle-info inline-block mr-2"></i>About this tool
+                </h5>
             </div>
-            <div class="card-body">
-                <p><i class="fas fa-square-arrow-up-right me-2"></i>This application tests a website's response to different user-agent strings...</p>
-                <p><i class="fas fa-chart-column me-2"></i>The application will make concurrent HTTP requests to the target URL...</p>
+            <div class="p-6 space-y-3"> 
+                 <p class="flex items-start text-sm">
+                    <i class="fas fa-square-arrow-up-right inline-block mr-2 mt-1 text-gray-500 w-4 text-center flex-shrink-0"></i>
+                    <span>This application tests a website's response to different user-agent strings, allowing you to see if the site delivers different content or behavior based on the detected browser or device.</span>
+                 </p>
+                 <p class="flex items-start text-sm">
+                    <i class="fas fa-chart-column inline-block mr-2 mt-1 text-gray-500 w-4 text-center flex-shrink-0"></i>
+                    <span>The application will make concurrent HTTP requests to the target URL, one for each selected user-agent (or all available if none are selected). The status code and response headers for each request will be displayed.</span>
+                </p>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
+        // Updated JS to use Tailwind's 'hidden' class
+        document.getElementById('uaForm').addEventListener('submit', function(e) {
             const btn = document.getElementById('submitBtn');
-            btn.querySelector('.normal-state').classList.add('d-none');
-            btn.querySelector('.loading-state').classList.remove('d-none');
+            const normalState = btn.querySelector('.normal-state');
+            const loadingState = btn.querySelector('.loading-state');
+
+            normalState.classList.add('hidden');
+            loadingState.classList.remove('hidden');
             btn.disabled = true;
+        });
+
+        // Reset button state when page is shown (including back navigation)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) { // Check if page is from cache
+                const btn = document.getElementById('submitBtn');
+                if (btn) {
+                    const normalState = btn.querySelector('.normal-state');
+                    const loadingState = btn.querySelector('.loading-state');
+                    normalState.classList.remove('hidden');
+                    loadingState.classList.add('hidden');
+                    btn.disabled = false;
+                }
+            }
         });
     </script>
 </body>
